@@ -1,0 +1,179 @@
+project(numerator)
+
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+
+if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(FATAL_ERROR "Doesn't support non 64-bit platform")
+endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
+
+include(FindThreads)
+include(CheckTypeSize)
+include(CheckIncludeFile)
+include(CheckCXXCompilerFlag)
+include(ExternalProject)
+
+CHECK_INCLUDE_FILES("inttypes.h" HAVE_INTTYPES_H)
+CHECK_INCLUDE_FILES("netinet/in.h" HAVE_NETINET_IN_H)
+
+if (HAVE_INTTYPES_H)
+    add_definitions("-DHAVE_INTTYPES_H")
+endif()
+
+if (HAVE_NETINET_IN_H)
+    add_definitions("-DHAVE_NETINET_IN_H")
+endif()
+
+include_directories(${numerator_SOURCE_DIR})
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W")
+
+if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    set(MAKE_PROGRAM "gmake")
+    set(BOOST_ROOT "/usr/local")
+else()
+    set(MAKE_PROGRAM "make")
+endif()
+
+find_package(Boost QUIET)
+if (NOT Boost_FOUND)
+    set(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
+    ExternalProject_Add(
+        boost
+        PREFIX ${boost_PREFIX}
+        URL "http://citylan.dl.sourceforge.net/project/boost/boost/1.53.0/boost_1_53_0.tar.gz"
+        URL_MD5 "57a9e2047c0f511c4dfcf00eb5eb2fbb"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND mkdir -p ${boost_PREFIX}/include/ && cp -r ${boost_PREFIX}/src/boost/boost ${boost_PREFIX}/include/
+    )
+    set(Boost_INCLUDE_DIRS ${boost_PREFIX})
+    include_directories(${Boost_INCLUDE_DIRS}/include)
+    message(STATUS "Using Boost from ${Boost_INCLUDE_DIRS}/include")
+else()
+    include_directories(${Boost_INCLUDE_DIRS})
+    message(STATUS "Using Boost from ${Boost_INCLUDE_DIRS}")
+endif()
+
+set(judy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/judy)
+ExternalProject_Add(
+    judy
+    PREFIX ${judy_PREFIX}
+    URL "http://citylan.dl.sourceforge.net/project/judy/judy/Judy-1.0.5/Judy-1.0.5.tar.gz"
+    URL_MD5 "115a0d26302676e962ae2f70ec484a54"
+    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${judy_PREFIX}/src/judy/configure --prefix=${judy_PREFIX} --enable-64-bit
+    BUILD_COMMAND ${MAKE_PROGRAM}
+    BUILD_IN_SOURCE 1
+)
+include_directories(${judy_PREFIX}/include)
+set(JUDY_LIBRARIES ${judy_PREFIX}/lib/libJudy.a)
+
+set(snappy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/snappy)
+ExternalProject_Add(
+    snappy
+    PREFIX ${snappy_PREFIX}
+    URL "http://snappy.googlecode.com/files/snappy-1.1.0.tar.gz"
+    URL_MD5 "c8f3ef29b5281e78f4946b2d739cea4f"
+    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${snappy_PREFIX}/src/snappy/configure --prefix=${snappy_PREFIX}
+    BUILD_COMMAND make
+    BUILD_IN_SOURCE 1
+)
+include_directories(${snappy_PREFIX}/include)
+set(SNAPPY_LIBRARIES ${snappy_PREFIX}/lib/libsnappy.a)
+
+set(leveldb_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/leveldb)
+ExternalProject_Add(
+    leveldb
+    PREFIX ${leveldb_PREFIX}
+    URL "http://leveldb.googlecode.com/files/leveldb-1.10.0.tar.gz"
+    URL_MD5 "7e5d8fd6de0daf545bb523b53a9d47c6"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${MAKE_PROGRAM} libleveldb.a
+    INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
+    BUILD_IN_SOURCE 1
+)
+add_dependencies(leveldb snappy)
+include_directories(${leveldb_PREFIX}/include)
+set(LEVELDB_LIBRARIES ${leveldb_PREFIX}/lib/libleveldb.a)
+
+set(glog_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/glog)
+ExternalProject_Add(
+    glog
+    PREFIX ${glog_PREFIX}
+    URL "http://google-glog.googlecode.com/files/glog-0.3.3.tar.gz"
+    URL_MD5 "a6fd2c22f8996846e34c763422717c18"
+    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${glog_PREFIX}/src/glog/configure --prefix=${glog_PREFIX} --enable-shared=no
+    BUILD_COMMAND make
+    BUILD_IN_SOURCE 1
+)
+include_directories(${glog_PREFIX}/include)
+set(GLOG_LIBRARIES ${glog_PREFIX}/lib/libglog.a)
+
+set(thrift_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/thrift)
+ExternalProject_Add(
+    thrift
+    PREFIX ${thrift_PREFIX}
+    URL "http://www.eu.apache.org/dist/thrift/0.9.0/thrift-0.9.0.tar.gz"
+    URL_MD5 "beb2c8290e97c93e3b2844f558cc5c7d"
+    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${thrift_PREFIX}/src/thrift/configure --prefix=${thrift_PREFIX} --with-boost=${Boost_INCLUDE_DIRS} --enable-shared=no --with-libevent=no --with-c_glib=no --with-java=no --with-erlang=no --with-python=no --with-perl=no --with-php=no --with-php_extension=no --with-ruby=no --with-haskell=no --with-go=no --with-d=no
+    BUILD_COMMAND ${MAKE_PROGRAM}
+    BUILD_IN_SOURCE 1
+)
+include_directories(${thrift_PREFIX}/include)
+set(THRIFT_LIBRARIES ${thrift_PREFIX}/lib/libthrift.a)
+set(THRIFT_GENERATOR ${thrift_PREFIX}/bin/thrift)
+if (NOT Boost_FOUND)
+    add_dependencies(thrift boost)
+endif()
+
+set(LINKLIBS    ${THRIFT_LIBRARIES}
+                ${LEVELDB_LIBRARIES}
+                ${SNAPPY_LIBRARIES}
+                ${GLOG_LIBRARIES}
+                ${JUDY_LIBRARIES}
+                ${CMAKE_THREAD_LIBS_INIT}
+)
+
+add_custom_command(
+    DEPENDS ${numerator_SOURCE_DIR}/numerator.thrift
+    COMMAND ${THRIFT_GENERATOR}
+    ARGS -r -gen py:new_style -gen cpp -o ${numerator_SOURCE_DIR} ${numerator_SOURCE_DIR}/numerator.thrift
+    OUTPUT  "${numerator_SOURCE_DIR}/gen-cpp/Numerator.cpp"
+            "${numerator_SOURCE_DIR}/gen-cpp/numerator_constants.cpp"
+            "${numerator_SOURCE_DIR}/gen-cpp/numerator_types.cpp"
+    COMMENT "Executing Thrift compiler"
+)
+set_source_files_properties(${numerator_SOURCE_DIR}/gen-cpp/Numerator.cpp
+                            ${numerator_SOURCE_DIR}/gen-cpp/numerator_constants.cpp
+                            ${numerator_SOURCE_DIR}/gen-cpp/numerator_types.cpp
+                            ${numerator_SOURCE_DIR}/gen-cpp/Numerator.h
+                            ${numerator_SOURCE_DIR}/gen-cpp/numerator_constants.h
+                            ${numerator_SOURCE_DIR}/gen-cpp/numerator_types.h
+                            PROPERTIES GENERATED TRUE
+)
+
+set(NUMERATOR_PROTOCOL_SOURCES  ${numerator_SOURCE_DIR}/gen-cpp/Numerator.cpp
+                                ${numerator_SOURCE_DIR}/gen-cpp/numerator_constants.cpp
+                                ${numerator_SOURCE_DIR}/gen-cpp/numerator_types.cpp
+)
+
+set(NUMERATOR_SOURCES   ${NUMERATOR_PROTOCOL_SOURCES}
+                        ${numerator_SOURCE_DIR}/disk_storage.cpp
+                        ${numerator_SOURCE_DIR}/memory_storage.cpp
+                        ${numerator_SOURCE_DIR}/signal_handler.cpp
+)
+
+add_library(numerator-static STATIC ${NUMERATOR_SOURCES})
+add_dependencies(numerator-static thrift)
+set_target_properties(numerator-static PROPERTIES OUTPUT_NAME numerator)
+set_target_properties(numerator-static PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(numerator ${numerator_SOURCE_DIR}/numerator.cpp)
+add_dependencies(numerator leveldb glog judy)
+
+target_link_libraries(numerator numerator-static ${LINKLIBS})
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(numerator rt)
+endif()
