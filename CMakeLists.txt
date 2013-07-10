@@ -65,6 +65,7 @@ ExternalProject_Add(
     URL_MD5 "115a0d26302676e962ae2f70ec484a54"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${judy_PREFIX}/src/judy/configure --prefix=${judy_PREFIX} --enable-64-bit
     BUILD_COMMAND ${MAKE_PROGRAM}
+    INSTALL_COMMAND ${MAKE_PROGRAM} install
     BUILD_IN_SOURCE 1
 )
 include_directories(${judy_PREFIX}/include)
@@ -119,6 +120,7 @@ ExternalProject_Add(
     URL_MD5 "beb2c8290e97c93e3b2844f558cc5c7d"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${thrift_PREFIX}/src/thrift/configure --prefix=${thrift_PREFIX} --with-boost=${Boost_INCLUDE_DIRS} --enable-shared=no --with-libevent=no --with-c_glib=no --with-java=no --with-erlang=no --with-python=no --with-perl=no --with-php=no --with-php_extension=no --with-ruby=no --with-haskell=no --with-go=no --with-d=no
     BUILD_COMMAND ${MAKE_PROGRAM}
+    INSTALL_COMMAND ${MAKE_PROGRAM} install
     BUILD_IN_SOURCE 1
 )
 include_directories(${thrift_PREFIX}/include)
