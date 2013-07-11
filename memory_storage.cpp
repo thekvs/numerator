@@ -8,14 +8,23 @@ MemoryStorage::find(const std::string &s, NumID &counter)
     NumID id = 0;
     bool  inserted = false;
 
-    ret = (PWord_t)JudySLGet(data, reinterpret_cast<const uint8_t*>(s.c_str()), PJE0);
-    if (ret != NULL) {
-        id = *ret;
+    JError_t err;
+
+    memset(&err, 0, sizeof(err));
+    PPvoid_t rv = JudySLGet(data, reinterpret_cast<const uint8_t*>(s.c_str()), &err);
+    THROW_EXC_IF_FAILED(JU_ERRNO(&err) == 0 && rv != PPJERR,
+        "Memory operaton failed, error code: %i", JU_ERRNO(&err));
+
+    if (rv != NULL) {
+        id = *reinterpret_cast<NumID*>(rv);
     } else {
-        value = (PWord_t)JudySLIns(&data, reinterpret_cast<const uint8_t*>(s.c_str()), PJE0);
-        THROW_EXC_IF_FAILED(value != PJERR, "Memory allocation failed");
-        *value = counter++;
-        id = *value;
+        memset(&err, 0, sizeof(err));
+        rv = JudySLIns(&data, reinterpret_cast<const uint8_t*>(s.c_str()), &err);
+        THROW_EXC_IF_FAILED(JU_ERRNO(&err) == 0 && rv != NULL && rv != PPJERR,
+            "Memory allocation failed, error code: %i", JU_ERRNO(&err));
+        value = reinterpret_cast<PWord_t>(rv);
+        id = counter++;
+        *value = id;
         inserted = true;
     }
 
@@ -25,14 +34,22 @@ MemoryStorage::find(const std::string &s, NumID &counter)
 void
 MemoryStorage::insert(const std::string &s, NumID id)
 {
-    value = (PWord_t)JudySLGet(data, reinterpret_cast<const uint8_t*>(s.c_str()), PJE0);
-    if (value == NULL) {
-        value = (PWord_t)JudySLIns(&data, reinterpret_cast<const uint8_t*>(s.c_str()), PJE0);
-        THROW_EXC_IF_FAILED(value != PJERR, "Memory allocation failed");
-        *value = id;
-    } else {
-        *value = id;
+    JError_t err;
+
+    memset(&err, 0, sizeof(err));
+    PPvoid_t rv = JudySLGet(data, reinterpret_cast<const uint8_t*>(s.c_str()), &err);
+    THROW_EXC_IF_FAILED(JU_ERRNO(&err) == 0 && rv != PPJERR,
+        "Memory operaton failed, error code: %i", JU_ERRNO(&err));
+
+    if (rv == NULL) {
+        memset(&err, 0, sizeof(err));
+        rv = JudySLIns(&data, reinterpret_cast<const uint8_t*>(s.c_str()), &err);
+        THROW_EXC_IF_FAILED(JU_ERRNO(&err) == 0 && rv != NULL && rv != PPJERR,
+            "Memory allocation failed, error code: %i", JU_ERRNO(&err));
     }
+
+    value = reinterpret_cast<PWord_t>(rv);
+    *value = id;
 }
 
 } // namespace

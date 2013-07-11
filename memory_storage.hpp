@@ -18,8 +18,7 @@ public:
 
     MemoryStorage():
         data((Pvoid_t)NULL),
-        value((PWord_t)NULL),
-        ret((PWord_t)NULL)
+        value((PWord_t)NULL)
     {
     }
 
@@ -36,7 +35,6 @@ private:
 
     Pvoid_t  data;
     Word_t  *value;
-    Word_t  *ret;
 };
 
 }
