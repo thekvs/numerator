@@ -4,6 +4,8 @@ namespace numerator {
 
 static sigset_t set;
 
+using namespace apache::thrift::server;
+
 void
 init_signals()
 {
@@ -19,13 +21,15 @@ init_signals()
 void*
 sigwaiter(void *arg)
 {
-    int status, signum;
+    if (arg == NULL) {
+        LOG(FATAL) << "Invalid argument";
+    }
 
-    using namespace apache::thrift::server;
+    int status, signum;
 
     TThreadPoolServer *server = static_cast<TThreadPoolServer*>(arg);
 
-    LOG(INFO) << "started sigwaiter thread";
+    LOG(INFO) << "started signal handling thread";
 
     while (true) {
         status = sigwait(&set, &signum);
@@ -33,9 +37,12 @@ sigwaiter(void *arg)
             if (signum == SIGINT || signum == SIGTERM || signum == SIGHUP) {
                 LOG(WARNING) << "received " << signum << " signal, exiting";
                 server->stop();
+                break;
             }
         }
     }
+
+    LOG(INFO) << "finished signal handling thread";
 
     return NULL;
 }
