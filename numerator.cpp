@@ -1,3 +1,7 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <iostream>
 
 #include <thrift/concurrency/ThreadManager.h>
@@ -96,19 +100,39 @@ usage(const char *program)
     std::cerr << std::endl;
     std::cerr << "Arguments:" << std::endl;
     std::cerr << "  -h                 write this help message" << std::endl;
-    std::cerr << "  -p PORT (=9090)    port to bind" << std::endl;
-    std::cerr << "  -l DIR (=/tmp)     directory where to write logs" << std::endl;
-    std::cerr << "  -d DIR (=/tmp/num) directory where to store data" << std::endl;
+    std::cerr << "  -l DIR             directory where to write logs" << std::endl;
+    std::cerr << "  -d DIR             directory where to store data" << std::endl;
     std::cerr << "  -t NUM (=10)       number of worker threads" << std::endl;
+    std::cerr << "  -p PORT (=9090)    port to bind" << std::endl;
 
     exit(EXIT_SUCCESS);
+}
+
+bool
+is_dir(std::string path)
+{
+    struct stat st;
+
+    memset(&st, 0, sizeof(st));
+
+    int rc = stat(path.c_str(), &st);
+    if (rc != 0) {
+        if (errno == ENOENT) {
+            return false;
+        } else {
+            std::cerr << "Error: stat() failed: " << strerror(errno) << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    return S_ISDIR(st.st_mode) ? true : false;
 }
 
 int
 main(int argc, char **argv)
 {
-    std::string data_dir = "/tmp/num";
-    std::string logs_dir = "/tmp";
+    std::string data_dir;
+    std::string logs_dir;
     unsigned    port = kDefaultPort;
     unsigned    threads = kNumThreadsCount;
 
@@ -146,6 +170,21 @@ main(int argc, char **argv)
                 std::cerr << "Run with -h switch to get help message" << std::endl;
                 exit(EXIT_FAILURE);
         }
+    }
+
+    if (data_dir.empty()) {
+        std::cerr << "Error: mandatory parameter -d is not specified" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (logs_dir.empty()) {
+        std::cerr << "Error: mandatory parameter -l is not specified" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (!is_dir(logs_dir)) {
+        std::cerr << "Error: " << logs_dir << " is not a directory or does not exist" << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     init_signals();
