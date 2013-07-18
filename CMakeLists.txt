@@ -88,8 +88,8 @@ set(leveldb_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/leveldb)
 ExternalProject_Add(
     leveldb
     PREFIX ${leveldb_PREFIX}
-    URL "http://leveldb.googlecode.com/files/leveldb-1.10.0.tar.gz"
-    URL_MD5 "7e5d8fd6de0daf545bb523b53a9d47c6"
+    URL "https://leveldb.googlecode.com/files/leveldb-1.12.0.tar.gz"
+    URL_MD5 "940a93e3538636e1d6d3407ca41b6397"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${MAKE_PROGRAM} libleveldb.a
     INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
