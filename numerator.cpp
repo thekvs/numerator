@@ -95,11 +95,11 @@ usage(const char *program)
     std::cerr << "Usage: " << program << " [-h] [-p PORT] [-d DIR] [-l DIR] [-t NUM]" << std::endl;
     std::cerr << std::endl;
     std::cerr << "Arguments:" << std::endl;
-    std::cerr << "  -h                         write help message" << std::endl;
-    std::cerr << "  -p PORT (default: 9090)    port to bind" << std::endl;
-    std::cerr << "  -l DIR (default: /tmp)     directory where to write logs" << std::endl;
-    std::cerr << "  -d DIR (default: /tmp/num) data directory" << std::endl;
-    std::cerr << "  -t NUM (default: 10)       number of worker threads" << std::endl;
+    std::cerr << "  -h                 write this help message" << std::endl;
+    std::cerr << "  -p PORT (=9090)    port to bind" << std::endl;
+    std::cerr << "  -l DIR (=/tmp)     directory where to write logs" << std::endl;
+    std::cerr << "  -d DIR (=/tmp/num) directory where to store data" << std::endl;
+    std::cerr << "  -t NUM (=10)       number of worker threads" << std::endl;
 
     exit(EXIT_SUCCESS);
 }
