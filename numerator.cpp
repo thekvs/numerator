@@ -119,11 +119,11 @@ main(int argc, char **argv)
             case 'p':
                 try {
                     port = boost::lexical_cast<unsigned>(optarg);
-                    break;
                 } catch (std::exception &e) {
                     std::cerr << "Error: invalid argument for -p switch" << std::endl;
                     exit(EXIT_FAILURE);
                 }
+                break;
             case 'd':
                 data_dir = optarg;
                 break;
@@ -131,13 +131,19 @@ main(int argc, char **argv)
                 logs_dir = optarg;
                 break;
             case 't':
-                threads = boost::lexical_cast<unsigned>(optarg);
+                try {
+                    threads = boost::lexical_cast<unsigned>(optarg);
+                } catch (std::exception &e) {
+                    std::cerr << "Error: invalid argument for -t switch" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
                 break;
             case 'h':
                 usage(argv[0]);
                 break;
             default:
                 std::cerr << "Error: invalid command line argument." << std::endl;
+                std::cerr << "Run with -h switch to get help message" << std::endl;
                 exit(EXIT_FAILURE);
         }
     }
