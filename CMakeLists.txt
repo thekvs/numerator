@@ -43,8 +43,8 @@ if (NOT Boost_FOUND)
     ExternalProject_Add(
         boost
         PREFIX ${boost_PREFIX}
-        URL "http://citylan.dl.sourceforge.net/project/boost/boost/1.53.0/boost_1_53_0.tar.gz"
-        URL_MD5 "57a9e2047c0f511c4dfcf00eb5eb2fbb"
+        URL "http://netcologne.dl.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.gz"
+        URL_MD5 "efbfbff5a85a9330951f243d0a46e4b9"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND mkdir -p ${boost_PREFIX}/include/ && cp -r ${boost_PREFIX}/src/boost/boost ${boost_PREFIX}/include/
@@ -88,8 +88,8 @@ set(leveldb_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/leveldb)
 ExternalProject_Add(
     leveldb
     PREFIX ${leveldb_PREFIX}
-    URL "http://leveldb.googlecode.com/files/leveldb-1.12.0.tar.gz"
-    URL_MD5 "940a93e3538636e1d6d3407ca41b6397"
+    URL "http://leveldb.googlecode.com/files/leveldb-1.13.0.tar.gz"
+    URL_MD5 "ae922e6e4a27a78cfc61a6c62f70dea2"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${MAKE_PROGRAM} libleveldb.a
     INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
@@ -116,8 +116,8 @@ set(thrift_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/thrift)
 ExternalProject_Add(
     thrift
     PREFIX ${thrift_PREFIX}
-    URL "http://www.eu.apache.org/dist/thrift/0.9.0/thrift-0.9.0.tar.gz"
-    URL_MD5 "beb2c8290e97c93e3b2844f558cc5c7d"
+    URL "http://www.eu.apache.org/dist/thrift/0.9.1/thrift-0.9.1.tar.gz"
+    URL_MD5 "d2e46148f6e800a9492dbd848c66ab6e"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${thrift_PREFIX}/src/thrift/configure --prefix=${thrift_PREFIX} --with-boost=${Boost_INCLUDE_DIRS} --enable-shared=no --with-libevent=no --with-c_glib=no --with-java=no --with-erlang=no --with-python=no --with-perl=no --with-php=no --with-php_extension=no --with-ruby=no --with-haskell=no --with-go=no --with-d=no
     BUILD_COMMAND ${MAKE_PROGRAM}
     INSTALL_COMMAND ${MAKE_PROGRAM} install
