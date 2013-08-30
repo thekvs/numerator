@@ -135,6 +135,17 @@ thrift_messages_logger(const char *message)
     LOG(WARNING) << message;
 }
 
+void*
+logs_flusher(void*)
+{
+    while (true) {
+        google::FlushLogFiles(google::INFO);
+        sleep(1);
+    }
+
+    return NULL;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -143,7 +154,7 @@ main(int argc, char **argv)
     unsigned    port = kDefaultPort;
     unsigned    threads = kNumThreadsCount;
 
-    int opt;
+    int opt, rc;
 
     while ((opt = getopt(argc, argv, "p:d:l:t:h")) != -1) {
         switch (opt) {
@@ -212,7 +223,13 @@ main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    google::FlushLogFiles(google::INFO);
+    pthread_t logs_flusher_tid;
+
+    rc = pthread_create(&logs_flusher_tid, NULL, &logs_flusher, NULL);
+    if (rc != 0) {
+        LOG(ERROR) << "pthread_create() failed: " << rc << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     // Route messages from Thrift internals to the log files
     GlobalOutput.setOutputFunction(thrift_messages_logger);
@@ -231,9 +248,9 @@ main(int argc, char **argv)
 
     TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, threadManager);
 
-    pthread_t tid;
+    pthread_t sigwaiter_tid;
 
-    int rc = pthread_create(&tid, NULL, &sigwaiter, &server);
+    rc = pthread_create(&sigwaiter_tid, NULL, &sigwaiter, &server);
     if (rc != 0) {
         LOG(ERROR) << "pthread_create() failed: " << rc << std::endl;
         exit(EXIT_FAILURE);
