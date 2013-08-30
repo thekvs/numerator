@@ -17,12 +17,14 @@ from thrift.protocol import TBinaryProtocol
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", type=str, metavar="FILE", required=True,
+    parser.add_argument("--data", type=str, metavar="arg", required=True,
                         help="file with data (one string per line)")
-    parser.add_argument("--batch-size", type=int, metavar="NUM", required=True,
+    parser.add_argument("--batch-size", type=int, metavar="arg", required=True,
                         help="number of items in one request")
     parser.add_argument("--type", type=str, choices=['s2i', 'i2s'], required=True,
                         help="type of the query")
+    parser.add_argument("--numerator", type=str, metavar="arg", default="localhost:9090",
+                        help="numerator's address (location:port)")
     parser.add_argument("--verbose", action="store_true",
                         help="increase output verbosity")
 
@@ -67,8 +69,9 @@ def main():
     args = parse_args()
 
     try:
+        host, port = args.numerator.split(":")
         # Make socket
-        transport = TSocket.TSocket('localhost', 9090)
+        transport = TSocket.TSocket(host, int(port))
         # Buffering is critical. Raw sockets are very slow
         transport = TTransport.TBufferedTransport(transport)
         # Wrap in a protocol
