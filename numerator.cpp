@@ -129,6 +129,12 @@ is_dir(std::string path)
     return S_ISDIR(st.st_mode) ? true : false;
 }
 
+void
+thrift_messages_logger(const char *message)
+{
+    LOG(WARNING) << message;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -207,6 +213,9 @@ main(int argc, char **argv)
     }
 
     google::FlushLogFiles(google::INFO);
+
+    // Route messages from Thrift internals to the log files
+    GlobalOutput.setOutputFunction(thrift_messages_logger);
 
     boost::shared_ptr<NumeratorHandler>  handler(new NumeratorHandler(memory_storage, disk_storage));
     boost::shared_ptr<TProcessor>        processor(new NumeratorProcessor(handler));
