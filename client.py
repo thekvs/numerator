@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument("--batch-size", type=int, metavar="NUM", required=True,
                         help="number of items in one request")
     parser.add_argument("--type", type=str, choices=['s2i', 'i2s'], required=True,
-                        help="type of a query")
+                        help="type of the query")
     parser.add_argument("--verbose", action="store_true",
                         help="increase output verbosity")
 
