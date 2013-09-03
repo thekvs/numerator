@@ -97,7 +97,7 @@ private:
 void
 usage(const char *program)
 {
-    std::cerr << "Usage: " << program << " [-h] [-p PORT] [-d DIR] [-l DIR] [-t NUM]" << std::endl;
+    std::cerr << "Usage: " << program << " [-h] [-p PORT] [-d DIR] [-l DIR] [-t NUM] [-c SIZE]" << std::endl;
     std::cerr << std::endl;
     std::cerr << "Arguments:" << std::endl;
     std::cerr << "  -h                 write this help message" << std::endl;
@@ -105,6 +105,8 @@ usage(const char *program)
     std::cerr << "  -d DIR             directory where to store data" << std::endl;
     std::cerr << "  -t NUM (=10)       number of worker threads" << std::endl;
     std::cerr << "  -p PORT (=9090)    port to bind" << std::endl;
+    std::cerr << "  -c SIZE            id to string lookups cache size (in MB)," << std::endl;
+    std::cerr << "                     if not specified use leveldb's default value" << std::endl;
 
     exit(EXIT_SUCCESS);
 }
@@ -153,10 +155,11 @@ main(int argc, char **argv)
     std::string logs_dir;
     unsigned    port = kDefaultPort;
     unsigned    threads = kNumThreadsCount;
+    size_t      cache_size = 0;
 
     int opt, rc;
 
-    while ((opt = getopt(argc, argv, "p:d:l:t:h")) != -1) {
+    while ((opt = getopt(argc, argv, "p:d:l:t:c:h")) != -1) {
         switch (opt) {
             case 'p':
                 try {
@@ -177,6 +180,14 @@ main(int argc, char **argv)
                     threads = boost::lexical_cast<unsigned>(optarg);
                 } catch (std::exception &e) {
                     std::cerr << "Error: invalid argument for -t switch" << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+                break;
+            case 'c':
+                try {
+                    cache_size = boost::lexical_cast<size_t>(optarg);
+                } catch (std::exception &e) {
+                    std::cerr << "Error: invalid argument for -c switch" << std::endl;
                     exit(EXIT_FAILURE);
                 }
                 break;
@@ -215,7 +226,7 @@ main(int argc, char **argv)
     MemoryStorage memory_storage;
 
     try {
-        disk_storage.init(data_dir);
+        disk_storage.init(data_dir, cache_size);
         cnt = disk_storage.load_in_memory(memory_storage);
         cnt++;
     } catch (std::exception &e) {

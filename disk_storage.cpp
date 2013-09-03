@@ -5,11 +5,15 @@ namespace numerator {
 static const std::string kEmptyString = "";
 
 void
-DiskStorage::init(const std::string &path)
+DiskStorage::init(const std::string &path, size_t cache)
 {
-    leveldb::Options options;
-
     options.create_if_missing = true;
+    
+    if (cache > 0) {
+        // cache option is in megabytes
+        options.block_cache = leveldb::NewLRUCache(1024 * 1024 * cache);
+    }
+
     leveldb::Status status = leveldb::DB::Open(options, path, &db);
     THROW_EXC_IF_FAILED(status.ok(), "LevelDB initialization failed: %s", status.ToString().c_str());
 }
@@ -37,7 +41,10 @@ DiskStorage::load_in_memory(MemoryStorage &storage)
 
     size_t loaded = 0;
 
-    boost::shared_ptr<leveldb::Iterator> it(db->NewIterator(leveldb::ReadOptions()));
+    leveldb::ReadOptions read_options;
+
+    read_options.fill_cache = false;
+    boost::shared_ptr<leveldb::Iterator> it(db->NewIterator(read_options));
 
     for (it->SeekToFirst(); it->Valid(); it->Next()) {
         THROW_EXC_IF_FAILED(it->status().ok(), "LevelDB iteration failed: %s", it->status().ToString().c_str());

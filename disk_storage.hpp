@@ -6,6 +6,7 @@
 
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
+#include <leveldb/cache.h>
 
 #include <boost/foreach.hpp>
 
@@ -34,18 +35,21 @@ public:
 
     DiskStorage(): db(NULL) {}
 
-    ~DiskStorage() {
+    ~DiskStorage()
+    {
         delete db;
+        delete options.block_cache;
     }
 
-    void init(const std::string &path);
+    void init(const std::string &path, size_t cache = 0);
     void write(const KVPairs &kv_pairs);
     NumID load_in_memory(MemoryStorage &storage);
     void lookup(const Keys &keys, Values &values, Failures &failures);
 
 private:
 
-    leveldb::DB *db;
+    leveldb::DB      *db;
+    leveldb::Options  options;
 };
 
 } // namespace
