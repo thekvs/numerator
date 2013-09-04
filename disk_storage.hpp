@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
@@ -45,6 +47,7 @@ public:
     void write(const KVPairs &kv_pairs);
     NumID load_in_memory(MemoryStorage &storage);
     void lookup(const Keys &keys, Values &values, Failures &failures);
+    void dump(std::ostream &stream);
 
 private:
 

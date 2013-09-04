@@ -87,4 +87,21 @@ DiskStorage::lookup(const Keys &keys, Values &values, Failures &failures)
     }
 }
 
+void
+DiskStorage::dump(std::ostream &stream)
+{
+    NumID current_id;
+
+    leveldb::ReadOptions read_options;
+
+    read_options.fill_cache = false;
+    boost::shared_ptr<leveldb::Iterator> it(db->NewIterator(read_options));
+
+    for (it->SeekToFirst(); it->Valid(); it->Next()) {
+        THROW_EXC_IF_FAILED(it->status().ok(), "LevelDB iteration failed: %s", it->status().ToString().c_str());
+        memcpy(&current_id, it->key().data(), it->key().size());
+        stream << current_id << "\t" << it->value().ToString() << std::endl;
+    }
+}
+
 } // namespace
