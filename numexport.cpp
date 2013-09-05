@@ -5,11 +5,12 @@ using namespace numerator;
 void
 usage(const char *program)
 {
-    std::cerr << "Usage: " << program << " [-h] -d DIR" << std::endl;
+    std::cerr << "Usage: " << program << " [-h] -d DIR [-o FILE]" << std::endl;
     std::cerr << std::endl;
     std::cerr << "Arguments:" << std::endl;
-    std::cerr << "  -h      write this help message" << std::endl;
-    std::cerr << "  -d DIR  directory with leveldb data files" << std::endl << std::endl;
+    std::cerr << "  -h       write this help message" << std::endl;
+    std::cerr << "  -d DIR   directory with leveldb data files" << std::endl;
+    std::cerr << "  -o FILE  file where to output data" << std::endl;
     
     exit(EXIT_SUCCESS);
 }
@@ -18,12 +19,16 @@ int
 main(int argc, char **argv)
 {
     std::string data_dir;
+    std::string output_file;
     int         opt;
 
-    while ((opt = getopt(argc, argv, "d:h")) != -1) {
+    while ((opt = getopt(argc, argv, "d:o:h")) != -1) {
         switch (opt) {
             case 'd':
                 data_dir = optarg;
+                break;
+            case 'o':
+                output_file = optarg;
                 break;
             case 'h':
                 usage(argv[0]);
@@ -49,7 +54,16 @@ main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    disk_storage.dump(std::cout);
+    if (!output_file.empty()) {
+        std::ofstream stream(output_file.c_str(), std::ios::trunc);
+        if (stream.fail()) {
+            std::cerr << "Error: couldn't open file \"" << output_file << "\" for writing" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        disk_storage.dump(stream);
+    } else {
+        disk_storage.dump(std::cout);
+    }
 
     return EXIT_SUCCESS;
 }
