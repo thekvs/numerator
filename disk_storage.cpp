@@ -3,6 +3,7 @@
 namespace numerator {
 
 static const std::string kEmptyString = "";
+static const size_t      kRestoreBatchSize = 10000;
 
 void
 DiskStorage::init(const std::string &path, size_t cache)
@@ -101,6 +102,36 @@ DiskStorage::dump(std::ostream &stream)
         THROW_EXC_IF_FAILED(it->status().ok(), "LevelDB iteration failed: %s", it->status().ToString().c_str());
         memcpy(&current_id, it->key().data(), it->key().size());
         stream << current_id << "\t" << it->value().ToString() << std::endl;
+    }
+}
+
+void
+DiskStorage::restore(const std::string &filename)
+{
+    THROW_EXC_IF_FAILED(db != NULL, "Database wasn't initialized");
+
+    std::ifstream file(filename.c_str());
+    THROW_EXC_IF_FAILED(!file.fail(), "Couldn't open data file \"%s\"", filename.c_str());
+
+    std::string line;
+    Values      items;
+    KVPairs     kv_pairs;
+    NumID       key;
+
+    kv_pairs.reserve(kRestoreBatchSize);
+
+    while (std::getline(file, line)) {
+        boost::split(items, line, boost::is_any_of("\t"));
+        key = boost::lexical_cast<NumID>(items[0]);
+        kv_pairs.push_back(KVPair(key, items[1]));
+        if (kv_pairs.size() >= kRestoreBatchSize) {
+            write(kv_pairs);
+            kv_pairs.clear();
+        }
+    }
+
+    if (kv_pairs.size()) {
+        write(kv_pairs);
     }
 }
 

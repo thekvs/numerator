@@ -11,6 +11,8 @@
 #include <leveldb/cache.h>
 
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "gen-cpp/Numerator.h"
 #include "exc.hpp"
@@ -48,6 +50,7 @@ public:
     NumID load_in_memory(MemoryStorage &storage);
     void lookup(const Keys &keys, Values &values, Failures &failures);
     void dump(std::ostream &stream);
+    void restore(const std::string &data_file);
 
 private:
 
