@@ -2,6 +2,7 @@
 #define __LOGGER_INITIALIZER_HPP_INCLUDED__
 
 #include <string>
+#include <pthread.h>
 
 #include <glog/logging.h>
 
@@ -30,6 +31,15 @@ public:
 
         s = dir + base_filename + ".log.WARNING.";
         google::SetLogDestination(google::WARNING, s.c_str());
+
+        pthread_t tid;
+        int       rc;
+
+        rc = pthread_create(&tid, NULL, &logs_flusher, NULL);
+        if (rc != 0) {
+            LOG(ERROR) << "pthread_create() failed: " << rc << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
 
     ~LoggerInitializer()
@@ -41,6 +51,17 @@ public:
 private:
 
     LoggerInitializer() {};
+
+    static void* logs_flusher(void*)
+    {
+        while (true) {
+            google::FlushLogFiles(google::INFO);
+            sleep(1);
+        }
+
+        return NULL;
+    }
+
 };
 
 } // namespace

@@ -137,17 +137,6 @@ thrift_messages_logger(const char *message)
     LOG(WARNING) << message;
 }
 
-void*
-logs_flusher(void*)
-{
-    while (true) {
-        google::FlushLogFiles(google::INFO);
-        sleep(1);
-    }
-
-    return NULL;
-}
-
 int
 main(int argc, char **argv)
 {
@@ -231,14 +220,6 @@ main(int argc, char **argv)
         cnt++;
     } catch (std::exception &e) {
         LOG(ERROR) << e.what();
-        exit(EXIT_FAILURE);
-    }
-
-    pthread_t logs_flusher_tid;
-
-    rc = pthread_create(&logs_flusher_tid, NULL, &logs_flusher, NULL);
-    if (rc != 0) {
-        LOG(ERROR) << "pthread_create() failed: " << rc << std::endl;
         exit(EXIT_FAILURE);
     }
 
