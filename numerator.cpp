@@ -247,17 +247,17 @@ main(int argc, char **argv)
 
     boost::shared_ptr<NumeratorHandler>  handler(new NumeratorHandler(memory_storage, disk_storage));
     boost::shared_ptr<TProcessor>        processor(new NumeratorProcessor(handler));
-    boost::shared_ptr<TServerTransport>  serverTransport(new TServerSocket(port));
-    boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-    boost::shared_ptr<TProtocolFactory>  protocolFactory(new TBinaryProtocolFactory());
+    boost::shared_ptr<TServerTransport>  server_transport(new TServerSocket(port));
+    boost::shared_ptr<TTransportFactory> transport_factory(new TBufferedTransportFactory());
+    boost::shared_ptr<TProtocolFactory>  protocol_factory(new TBinaryProtocolFactory());
 
-    boost::shared_ptr<ThreadManager>      threadManager = ThreadManager::newSimpleThreadManager(threads);
-    boost::shared_ptr<PosixThreadFactory> threadFactory = boost::shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
+    boost::shared_ptr<ThreadManager>      thread_manager = ThreadManager::newSimpleThreadManager(threads);
+    boost::shared_ptr<PosixThreadFactory> thread_factory = boost::shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
 
-    threadManager->threadFactory(threadFactory);
-    threadManager->start();
+    thread_manager->threadFactory(thread_factory);
+    thread_manager->start();
 
-    TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, threadManager);
+    TThreadPoolServer server(processor, server_transport, transport_factory, protocol_factory, thread_manager);
 
     pthread_t sigwaiter_tid;
 
