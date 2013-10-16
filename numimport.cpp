@@ -10,7 +10,7 @@ usage(const char *program)
     std::cerr << "Arguments:" << std::endl;
     std::cerr << "  -h       write this help message" << std::endl;
     std::cerr << "  -d DIR   directory with leveldb data files" << std::endl;
-    std::cerr << "  -i FILE  file data to import into leveldb database" << std::endl;
+    std::cerr << "  -i FILE  file with data to import into leveldb database" << std::endl;
     
     exit(EXIT_SUCCESS);
 }
