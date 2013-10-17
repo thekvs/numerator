@@ -37,6 +37,7 @@ static NumID cnt;
 
 static const unsigned kNumThreadsCount = 10;
 static const unsigned kDefaultPort = 9090;
+static const int      kDefaultCacheSize = 0;
 
 class NumeratorHandler: virtual public NumeratorIf {
 public:
@@ -105,8 +106,9 @@ usage(const char *program)
     std::cerr << "  -d DIR             directory where to store data" << std::endl;
     std::cerr << "  -t NUM (=10)       number of worker threads" << std::endl;
     std::cerr << "  -p PORT (=9090)    port to bind" << std::endl;
-    std::cerr << "  -c SIZE            id to string lookups cache size (in MB)," << std::endl;
-    std::cerr << "                     if not specified use leveldb's default value" << std::endl;
+    std::cerr << "  -c SIZE            id to string lookups cache size in MB," << std::endl;
+    std::cerr << "                     (if not specified - use default cache size," << std::endl;
+    std::cerr << "                      if negative value - disable caching)" << std::endl;
 
     exit(EXIT_SUCCESS);
 }
@@ -142,11 +144,12 @@ main(int argc, char **argv)
 {
     std::string data_dir;
     std::string logs_dir;
+
     unsigned    port = kDefaultPort;
     unsigned    threads = kNumThreadsCount;
-    size_t      cache_size = 0;
+    int         cache_size = kDefaultCacheSize;
 
-    int opt, rc;
+    int         opt, rc;
 
     while ((opt = getopt(argc, argv, "p:d:l:t:c:h")) != -1) {
         switch (opt) {
@@ -174,7 +177,7 @@ main(int argc, char **argv)
                 break;
             case 'c':
                 try {
-                    cache_size = boost::lexical_cast<size_t>(optarg);
+                    cache_size = boost::lexical_cast<int>(optarg);
                 } catch (std::exception &e) {
                     std::cerr << "Error: invalid argument for -c switch" << std::endl;
                     exit(EXIT_FAILURE);

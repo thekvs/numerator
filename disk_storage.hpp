@@ -37,7 +37,10 @@ typedef std::vector<FailureIdx>  Failures;
 class DiskStorage {
 public:
 
-    DiskStorage(): db(NULL) {}
+    DiskStorage():
+        db(NULL),
+        cache_size(0)
+    {}
 
     ~DiskStorage()
     {
@@ -45,7 +48,7 @@ public:
         delete options.block_cache;
     }
 
-    void init(const std::string &path, size_t cache = 0);
+    void init(const std::string &path, int cache = 0);
     void write(const KVPairs &kv_pairs);
     NumID load_in_memory(MemoryStorage &storage);
     void lookup(const Keys &keys, Values &values, Failures &failures);
@@ -55,6 +58,7 @@ public:
 private:
 
     leveldb::DB      *db;
+    int               cache_size;
     leveldb::Options  options;
 };
 

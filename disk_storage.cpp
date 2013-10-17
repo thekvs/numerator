@@ -6,11 +6,13 @@ static const std::string kEmptyString = "";
 static const size_t      kRestoreBatchSize = 10000;
 
 void
-DiskStorage::init(const std::string &path, size_t cache)
+DiskStorage::init(const std::string &path, int cache)
 {
+    cache_size = cache;
+
     options.create_if_missing = true;
     
-    if (cache > 0) {
+    if (cache_size > 0) {
         // cache option is in megabytes
         options.block_cache = leveldb::NewLRUCache(1024 * 1024 * cache);
     }
@@ -73,9 +75,15 @@ DiskStorage::lookup(const Keys &keys, Values &values, Failures &failures)
 
     FailureIdx failure_idx = 0;
 
+    leveldb::ReadOptions read_options;
+
+    if (cache_size < 0) {
+        read_options.fill_cache = false;
+    }
+
     BOOST_FOREACH(const Keys::value_type &k, keys) {
         leveldb::Slice key(reinterpret_cast<const char*>(&k), sizeof(k));
-        status = db->Get(leveldb::ReadOptions(), key, &value);
+        status = db->Get(read_options, key, &value);
         if (status.ok()) {
             values.push_back(value);
         } else if (status.IsNotFound()) {
