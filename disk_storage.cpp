@@ -133,7 +133,11 @@ DiskStorage::restore(const std::string &filename)
 
     while (std::getline(file, line)) {
         boost::split(items, line, boost::is_any_of("\t"));
-        key = boost::lexical_cast<NumID>(items[0]);
+        try {
+            key = boost::lexical_cast<NumID>(items[0]);
+        } catch (std::exception &exc) {
+            THROW_EXC("%s at \"%s\"", exc.what(), line.c_str());
+        }
         kv_pairs.push_back(KVPair(key, items[1]));
         if (kv_pairs.size() >= kRestoreBatchSize) {
             write(kv_pairs);
