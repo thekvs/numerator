@@ -9,6 +9,7 @@
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
 #include <leveldb/cache.h>
+#include <leveldb/filter_policy.h>
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -46,6 +47,7 @@ public:
     {
         delete db;
         delete options.block_cache;
+        delete options.filter_policy;
     }
 
     void init(const std::string &path, int cache = 0);

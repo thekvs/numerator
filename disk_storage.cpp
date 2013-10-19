@@ -4,6 +4,7 @@ namespace numerator {
 
 static const std::string kEmptyString = "";
 static const size_t      kRestoreBatchSize = 10000;
+static const int         kBloomFilterBits = 10;
 
 void
 DiskStorage::init(const std::string &path, int cache)
@@ -16,6 +17,8 @@ DiskStorage::init(const std::string &path, int cache)
         // cache option is in megabytes
         options.block_cache = leveldb::NewLRUCache(1024 * 1024 * cache);
     }
+
+    options.filter_policy = leveldb::NewBloomFilterPolicy(kBloomFilterBits);
 
     leveldb::Status status = leveldb::DB::Open(options, path, &db);
     THROW_EXC_IF_FAILED(status.ok(), "LevelDB initialization failed: %s", status.ToString().c_str());
