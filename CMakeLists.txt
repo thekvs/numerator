@@ -193,3 +193,7 @@ target_link_libraries(numimport numerator-static ${LINKLIBS})
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(numimport rt)
 endif()
+
+install(PROGRAMS ${numerator_BINARY_DIR}/numerator DESTINATION .)
+install(PROGRAMS ${numerator_BINARY_DIR}/numexport DESTINATION .)
+install(PROGRAMS ${numerator_BINARY_DIR}/numimport DESTINATION .)
