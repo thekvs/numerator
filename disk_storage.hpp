@@ -54,8 +54,8 @@ public:
     void write(const KVPairs &kv_pairs);
     NumID load_in_memory(MemoryStorage &storage);
     void lookup(const Keys &keys, Values &values, Failures &failures);
-    void dump(std::ostream &stream);
-    void restore(const std::string &data_file);
+    void dump(std::ostream &stream, bool binary_dump=false);
+    void restore(std::ifstream &stream, bool binary_dump=false);
 
 private:
 

@@ -11,6 +11,7 @@ usage(const char *program)
     std::cerr << "  -h       write this help message" << std::endl;
     std::cerr << "  -d DIR   directory with leveldb data files" << std::endl;
     std::cerr << "  -o FILE  file where to output data" << std::endl;
+    std::cerr << "  -b       produce binary dump" << std::endl;
     
     exit(EXIT_SUCCESS);
 }
@@ -21,8 +22,9 @@ main(int argc, char **argv)
     std::string data_dir;
     std::string output_file;
     int         opt;
+    bool        binary_dump = false;
 
-    while ((opt = getopt(argc, argv, "d:o:h")) != -1) {
+    while ((opt = getopt(argc, argv, "d:o:hb")) != -1) {
         switch (opt) {
             case 'd':
                 data_dir = optarg;
@@ -32,6 +34,9 @@ main(int argc, char **argv)
                 break;
             case 'h':
                 usage(argv[0]);
+                break;
+            case 'b':
+                binary_dump = true;
                 break;
             default:
                 std::cerr << "Error: invalid command line argument." << std::endl;
@@ -55,12 +60,16 @@ main(int argc, char **argv)
     }
 
     if (!output_file.empty()) {
-        std::ofstream stream(output_file.c_str(), std::ios::trunc);
+        std::ios_base::openmode mode = std::ios::trunc;
+        if (binary_dump) {
+            mode |= std::ios::binary;
+        }
+        std::ofstream stream(output_file.c_str(), mode);
         if (stream.fail()) {
             std::cerr << "Error: couldn't open file \"" << output_file << "\" for writing" << std::endl;
             exit(EXIT_FAILURE);
         }
-        disk_storage.dump(stream);
+        disk_storage.dump(stream, binary_dump);
     } else {
         disk_storage.dump(std::cout);
     }

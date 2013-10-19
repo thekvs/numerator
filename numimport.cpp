@@ -11,6 +11,7 @@ usage(const char *program)
     std::cerr << "  -h       write this help message" << std::endl;
     std::cerr << "  -d DIR   directory with leveldb data files" << std::endl;
     std::cerr << "  -i FILE  file with data to import into leveldb database" << std::endl;
+    std::cerr << "  -b       restore from binary dump" << std::endl;
     
     exit(EXIT_SUCCESS);
 }
@@ -21,8 +22,9 @@ main(int argc, char **argv)
     std::string data_dir;
     std::string data_file;
     int         opt;
+    bool        binary_dump = false;
 
-    while ((opt = getopt(argc, argv, "d:i:h")) != -1) {
+    while ((opt = getopt(argc, argv, "d:i:hb")) != -1) {
         switch (opt) {
             case 'd':
                 data_dir = optarg;
@@ -32,6 +34,9 @@ main(int argc, char **argv)
                 break;
             case 'h':
                 usage(argv[0]);
+                break;
+            case 'b':
+                binary_dump = true;
                 break;
             default:
                 std::cerr << "Error: invalid command line argument." << std::endl;
@@ -54,7 +59,13 @@ main(int argc, char **argv)
 
     try {
         disk_storage.init(data_dir);
-        disk_storage.restore(data_file);
+        std::ios_base::openmode mode = std::ios::in;
+        if (binary_dump) {
+            mode |= std::ios::binary;
+        }
+        std::ifstream stream(data_file.c_str(), mode);
+        THROW_EXC_IF_FAILED(!stream.fail(), "Couldn't open data stream \"%s\"", data_file.c_str());
+        disk_storage.restore(stream, binary_dump);
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
         exit(EXIT_FAILURE);
