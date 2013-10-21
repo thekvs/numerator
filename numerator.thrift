@@ -8,6 +8,10 @@ enum Operation {
     ID2STR = 2
 }
 
+enum ErrorCode {
+    STR2ID_QUERIES_DISABLED = 1
+}
+
 struct Query {
     1: required Operation   op,
     2: list<string>         strings,
@@ -15,7 +19,12 @@ struct Query {
     4: list<FailureIdx>     failures    // indexes of ID2STR type queries for which no values were found
 }
 
+exception NumeratorException {
+    1: required ErrorCode code,
+    2: string             message
+}
+
 service Numerator {
     void ping(),
-    Query query(1: Query request)
+    Query query(1: Query request) throws (1:NumeratorException exc)
 }

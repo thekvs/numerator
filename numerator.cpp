@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <unistd.h>
+#include <getopt.h>
 
 #include <iostream>
 
@@ -39,12 +40,22 @@ static const unsigned kNumThreadsCount = 10;
 static const unsigned kDefaultPort = 9090;
 static const int      kDefaultCacheSize = 0;
 
+struct NumeratorHandlerOptions {
+    bool disable_s2i_queries;
+
+    NumeratorHandlerOptions():
+        disable_s2i_queries(false)
+    {
+    }
+};
+
 class NumeratorHandler: virtual public NumeratorIf {
 public:
 
-    NumeratorHandler(MemoryStorage &_memory_storage, DiskStorage &_disk_storage):
+    NumeratorHandler(MemoryStorage &_memory_storage, DiskStorage &_disk_storage, NumeratorHandlerOptions _options):
         memory_storage(_memory_storage),
-        disk_storage(_disk_storage)
+        disk_storage(_disk_storage),
+        options(_options)
     {
     }
 
@@ -52,6 +63,8 @@ public:
     {
         try {
             query_impl(response, request);
+        } catch (NumeratorException) {
+            throw; // propagate this exception to the client
         } catch (std::exception &e) {
             LOG(ERROR) << e.what();
             exit(EXIT_FAILURE);
@@ -65,13 +78,23 @@ private:
     MemoryStorage &memory_storage;
     DiskStorage   &disk_storage;
 
+    NumeratorHandlerOptions options;
+
     void query_impl(Query& response, const Query& request)
     {
         // Looks like every service's method acquires global lock (if we use threads),
         // so there is no need for another synchronization/lock mechanism.
         if (request.op == Operation::ID2STR) {
             disk_storage.lookup(request.ids, response.strings, response.failures);
-        } else {
+        } else if (request.op == Operation::STR2ID) {
+            // this type of queries was disabled
+            if (options.disable_s2i_queries) {
+                NumeratorException exc;
+                exc.code = ErrorCode::STR2ID_QUERIES_DISABLED;
+                exc.message = "string -> id service disabled";
+                throw exc;
+            }
+
             size_t i;
             size_t count = request.strings.size();
 
@@ -98,17 +121,18 @@ private:
 void
 usage(const char *program)
 {
-    std::cerr << "Usage: " << program << " [-h] [-p PORT] [-d DIR] [-l DIR] [-t NUM] [-c SIZE]" << std::endl;
+    std::cerr << "Usage: " << program << " args" << std::endl;
     std::cerr << std::endl;
     std::cerr << "Arguments:" << std::endl;
-    std::cerr << "  -h                 write this help message" << std::endl;
-    std::cerr << "  -l DIR             directory where to write logs" << std::endl;
-    std::cerr << "  -d DIR             directory where to store data" << std::endl;
-    std::cerr << "  -t NUM (=10)       number of worker threads" << std::endl;
-    std::cerr << "  -p PORT (=9090)    port to bind" << std::endl;
-    std::cerr << "  -c SIZE            id to string lookups cache size in MB," << std::endl;
-    std::cerr << "                     (if not specified - use default cache size," << std::endl;
-    std::cerr << "                      if negative value - disable caching)" << std::endl;
+    std::cerr << "  -h,--help               write this help message" << std::endl;
+    std::cerr << "  -l,--logs-dir DIR       directory where to write logs" << std::endl;
+    std::cerr << "  -d,--data-dir DIR       directory where to store data" << std::endl;
+    std::cerr << "  -t,--threads NUM (=10)  number of worker threads" << std::endl;
+    std::cerr << "  -p,--port PORT (=9090)  port to bind" << std::endl;
+    std::cerr << "  -c,--cache-size SIZE    id to string lookups cache size in MB," << std::endl;
+    std::cerr << "                          (if not specified - use default cache size," << std::endl;
+    std::cerr << "                          if negative value - disable caching)" << std::endl;
+    std::cerr << "  -S,--disable-s2i        disable string -> id type requests" << std::endl;
 
     exit(EXIT_SUCCESS);
 }
@@ -142,16 +166,28 @@ thrift_messages_logger(const char *message)
 int
 main(int argc, char **argv)
 {
+    static struct option longopts[] = {
+        { "data-dir",       required_argument,  NULL,   'd' },
+        { "logs-dir",       required_argument,  NULL,   'l' },
+        { "threads",        required_argument,  NULL,   't' },
+        { "port",           required_argument,  NULL,   'p' },
+        { "cache-size",     required_argument,  NULL,   'c' },
+        { "disable-s2i",    no_argument,        NULL,   'S' },
+        { "help",           no_argument,        NULL,   'h' },
+        { NULL,             0,                  NULL,   0   }
+    };
+
     std::string data_dir;
     std::string logs_dir;
 
     unsigned    port = kDefaultPort;
     unsigned    threads = kNumThreadsCount;
     int         cache_size = kDefaultCacheSize;
+    bool        disable_s2i_queries = false;
 
-    int         opt, rc;
+    int         opt, rc, optidx;
 
-    while ((opt = getopt(argc, argv, "p:d:l:t:c:h")) != -1) {
+    while ((opt = getopt_long(argc, argv, "p:d:l:t:c:hS", longopts, &optidx)) != -1) {
         switch (opt) {
             case 'p':
                 try {
@@ -186,6 +222,9 @@ main(int argc, char **argv)
             case 'h':
                 usage(argv[0]);
                 break;
+            case 'S':
+                disable_s2i_queries = true;
+                break;
             default:
                 std::cerr << "Error: invalid command line argument." << std::endl;
                 std::cerr << "Run with -h switch to get help message" << std::endl;
@@ -219,8 +258,10 @@ main(int argc, char **argv)
 
     try {
         disk_storage.init(data_dir, cache_size);
-        cnt = disk_storage.load_in_memory(memory_storage);
-        cnt++;
+        if (!disable_s2i_queries) {
+            cnt = disk_storage.load_in_memory(memory_storage);
+            cnt++;
+        }
     } catch (std::exception &e) {
         LOG(ERROR) << e.what();
         exit(EXIT_FAILURE);
@@ -229,7 +270,13 @@ main(int argc, char **argv)
     // Route messages from Thrift internals to the log files
     GlobalOutput.setOutputFunction(thrift_messages_logger);
 
-    boost::shared_ptr<NumeratorHandler>  handler(new NumeratorHandler(memory_storage, disk_storage));
+    NumeratorHandlerOptions options;
+
+    if (disable_s2i_queries) {
+        options.disable_s2i_queries = true;
+    }
+
+    boost::shared_ptr<NumeratorHandler>  handler(new NumeratorHandler(memory_storage, disk_storage, options));
     boost::shared_ptr<TProcessor>        processor(new NumeratorProcessor(handler));
     boost::shared_ptr<TServerTransport>  server_transport(new TServerSocket(port));
     boost::shared_ptr<TTransportFactory> transport_factory(new TBufferedTransportFactory());
