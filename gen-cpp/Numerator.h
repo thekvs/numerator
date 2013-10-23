@@ -17,6 +17,8 @@ class NumeratorIf {
   virtual ~NumeratorIf() {}
   virtual void ping() = 0;
   virtual void query(Query& _return, const Query& request) = 0;
+  virtual void disable_s2i() = 0;
+  virtual void enable_s2i() = 0;
 };
 
 class NumeratorIfFactory {
@@ -50,6 +52,12 @@ class NumeratorNull : virtual public NumeratorIf {
     return;
   }
   void query(Query& /* _return */, const Query& /* request */) {
+    return;
+  }
+  void disable_s2i() {
+    return;
+  }
+  void enable_s2i() {
     return;
   }
 };
@@ -246,6 +254,154 @@ class Numerator_query_presult {
 
 };
 
+
+class Numerator_disable_s2i_args {
+ public:
+
+  Numerator_disable_s2i_args() {
+  }
+
+  virtual ~Numerator_disable_s2i_args() throw() {}
+
+
+  bool operator == (const Numerator_disable_s2i_args & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const Numerator_disable_s2i_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Numerator_disable_s2i_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class Numerator_disable_s2i_pargs {
+ public:
+
+
+  virtual ~Numerator_disable_s2i_pargs() throw() {}
+
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class Numerator_disable_s2i_result {
+ public:
+
+  Numerator_disable_s2i_result() {
+  }
+
+  virtual ~Numerator_disable_s2i_result() throw() {}
+
+
+  bool operator == (const Numerator_disable_s2i_result & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const Numerator_disable_s2i_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Numerator_disable_s2i_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class Numerator_disable_s2i_presult {
+ public:
+
+
+  virtual ~Numerator_disable_s2i_presult() throw() {}
+
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class Numerator_enable_s2i_args {
+ public:
+
+  Numerator_enable_s2i_args() {
+  }
+
+  virtual ~Numerator_enable_s2i_args() throw() {}
+
+
+  bool operator == (const Numerator_enable_s2i_args & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const Numerator_enable_s2i_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Numerator_enable_s2i_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class Numerator_enable_s2i_pargs {
+ public:
+
+
+  virtual ~Numerator_enable_s2i_pargs() throw() {}
+
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class Numerator_enable_s2i_result {
+ public:
+
+  Numerator_enable_s2i_result() {
+  }
+
+  virtual ~Numerator_enable_s2i_result() throw() {}
+
+
+  bool operator == (const Numerator_enable_s2i_result & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const Numerator_enable_s2i_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Numerator_enable_s2i_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class Numerator_enable_s2i_presult {
+ public:
+
+
+  virtual ~Numerator_enable_s2i_presult() throw() {}
+
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
 class NumeratorClient : virtual public NumeratorIf {
  public:
   NumeratorClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) :
@@ -272,6 +428,12 @@ class NumeratorClient : virtual public NumeratorIf {
   void query(Query& _return, const Query& request);
   void send_query(const Query& request);
   void recv_query(Query& _return);
+  void disable_s2i();
+  void send_disable_s2i();
+  void recv_disable_s2i();
+  void enable_s2i();
+  void send_enable_s2i();
+  void recv_enable_s2i();
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -289,11 +451,15 @@ class NumeratorProcessor : public ::apache::thrift::TDispatchProcessor {
   ProcessMap processMap_;
   void process_ping(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_query(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_disable_s2i(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_enable_s2i(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   NumeratorProcessor(boost::shared_ptr<NumeratorIf> iface) :
     iface_(iface) {
     processMap_["ping"] = &NumeratorProcessor::process_ping;
     processMap_["query"] = &NumeratorProcessor::process_query;
+    processMap_["disable_s2i"] = &NumeratorProcessor::process_disable_s2i;
+    processMap_["enable_s2i"] = &NumeratorProcessor::process_enable_s2i;
   }
 
   virtual ~NumeratorProcessor() {}
@@ -339,6 +505,24 @@ class NumeratorMultiface : virtual public NumeratorIf {
     }
     ifaces_[i]->query(_return, request);
     return;
+  }
+
+  void disable_s2i() {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->disable_s2i();
+    }
+    ifaces_[i]->disable_s2i();
+  }
+
+  void enable_s2i() {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->enable_s2i();
+    }
+    ifaces_[i]->enable_s2i();
   }
 
 };

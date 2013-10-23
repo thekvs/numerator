@@ -24,8 +24,18 @@ public:
 
     ~MemoryStorage()
     {
+        unload();
+    }
+
+    bool empty() const {
+        return (data == (Pvoid_t)NULL);
+    }
+
+    void unload()
+    {
         long bytes;
         JSLFA(bytes, data);
+        data = NULL;   
     }
 
     std::pair<bool, NumID> find(const std::string &s, NumID &counter);

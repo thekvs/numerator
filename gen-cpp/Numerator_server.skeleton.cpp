@@ -32,6 +32,16 @@ class NumeratorHandler : virtual public NumeratorIf {
     printf("query\n");
   }
 
+  void disable_s2i() {
+    // Your implementation goes here
+    printf("disable_s2i\n");
+  }
+
+  void enable_s2i() {
+    // Your implementation goes here
+    printf("enable_s2i\n");
+  }
+
 };
 
 int main(int argc, char **argv) {

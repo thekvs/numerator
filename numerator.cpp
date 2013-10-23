@@ -73,6 +73,22 @@ public:
 
     void ping() {}
 
+    void disable_s2i()
+    {
+        if (!options.disable_s2i_queries) {
+            memory_storage.unload();
+            options.disable_s2i_queries = true;
+        }
+    }
+
+    void enable_s2i()
+    {
+        if (options.disable_s2i_queries) {
+            disk_storage.load_in_memory(memory_storage);
+            options.disable_s2i_queries = false;
+        }
+    }
+
 private:
 
     MemoryStorage &memory_storage;

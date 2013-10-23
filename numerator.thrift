@@ -26,5 +26,7 @@ exception NumeratorException {
 
 service Numerator {
     void ping(),
-    Query query(1: Query request) throws (1:NumeratorException exc)
+    Query query(1: Query request) throws (1:NumeratorException exc),
+    void disable_s2i(),
+    void enable_s2i()
 }
