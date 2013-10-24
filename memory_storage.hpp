@@ -11,14 +11,12 @@
 
 namespace numerator {
 
-/*typedef std::map<std::string, NumID> MemoryStorage;*/
-
 class MemoryStorage {
 public:
 
     MemoryStorage():
-        data((Pvoid_t)NULL),
-        value((PWord_t)NULL)
+        data(NULL),
+        value(NULL)
     {
     }
 
@@ -28,7 +26,7 @@ public:
     }
 
     bool empty() const {
-        return (data == (Pvoid_t)NULL);
+        return (data == NULL);
     }
 
     void unload()
