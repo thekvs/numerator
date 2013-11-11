@@ -10,7 +10,7 @@
 
 namespace numerator {
 
-#ifdef __GNUC__
+#if defined  __GNUC__ || defined __clang__
 #   define CHECK_PRINTF_ARGS(f, e) __attribute__ ((format (printf, f, e)))
 #else
 #   define CHECK_PRINTF_ARGS(f, e)
