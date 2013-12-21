@@ -75,8 +75,8 @@ set(snappy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/snappy)
 ExternalProject_Add(
     snappy
     PREFIX ${snappy_PREFIX}
-    URL "http://snappy.googlecode.com/files/snappy-1.1.0.tar.gz"
-    URL_MD5 "c8f3ef29b5281e78f4946b2d739cea4f"
+    URL "http://snappy.googlecode.com/files/snappy-1.1.1.tar.gz"
+    URL_MD5 "8887e3b7253b22a31f5486bca3cbc1c2"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${snappy_PREFIX}/src/snappy/configure --prefix=${snappy_PREFIX}
     BUILD_COMMAND make
     BUILD_IN_SOURCE 1
@@ -88,8 +88,8 @@ set(leveldb_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/leveldb)
 ExternalProject_Add(
     leveldb
     PREFIX ${leveldb_PREFIX}
-    URL "http://leveldb.googlecode.com/files/leveldb-1.14.0.tar.gz"
-    URL_MD5 "38ce005460d71040f959d71fd8d7fc78"
+    URL "http://leveldb.googlecode.com/files/leveldb-1.15.0.tar.gz"
+    URL_MD5 "e91fd7cbced8b84e21f357a866ad226a"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${MAKE_PROGRAM} libleveldb.a
     INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
