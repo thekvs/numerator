@@ -87,15 +87,15 @@ set(SNAPPY_LIBRARIES ${snappy_PREFIX}/lib/libsnappy.a)
 set(leveldb_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/leveldb)
 ExternalProject_Add(
     leveldb
+    DEPENDS snappy
     PREFIX ${leveldb_PREFIX}
-    URL "http://leveldb.googlecode.com/files/leveldb-1.15.0.tar.gz"
-    URL_MD5 "e91fd7cbced8b84e21f357a866ad226a"
+    GIT_REPOSITORY "http://code.google.com/p/leveldb/"
+    GIT_TAG "269fc6ca9416129248db5ca57050cd5d39d177c8"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${MAKE_PROGRAM} libleveldb.a
     INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
     BUILD_IN_SOURCE 1
 )
-add_dependencies(leveldb snappy)
 include_directories(${leveldb_PREFIX}/include)
 set(LEVELDB_LIBRARIES ${leveldb_PREFIX}/lib/libleveldb.a)
 
