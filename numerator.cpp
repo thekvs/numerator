@@ -19,6 +19,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp> 
 
 #include "gen-cpp/Numerator.h"
 #include "disk_storage.hpp"
@@ -35,6 +37,7 @@ using namespace apache::thrift::concurrency;
 using namespace numerator;
 
 static NumID cnt;
+static boost::mutex mutex;
 
 static const unsigned kNumThreadsCount = 10;
 static const unsigned kDefaultPort = 9090;
@@ -98,8 +101,8 @@ private:
 
     void query_impl(Query& response, const Query& request)
     {
-        // Looks like every service's method acquires global lock (if we use threads),
-        // so there is no need for another synchronization/lock mechanism.
+        boost::lock_guard<boost::mutex> guard(mutex);
+
         if (request.op == Operation::ID2STR) {
             disk_storage.lookup(request.ids, response.strings, response.failures);
         } else if (request.op == Operation::STR2ID) {
