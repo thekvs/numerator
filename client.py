@@ -27,6 +27,8 @@ def parse_args():
                         help="numerator's address (location:port)")
     parser.add_argument("--verbose", action="store_true",
                         help="increase output verbosity")
+    parser.add_argument("--silent", action="store_true",
+                        help="be silent and print nothing")
 
     args = parser.parse_args()
 
@@ -44,11 +46,12 @@ def do_query(args, client, data):
     if args.type == "s2i":
         request = Query(get_query_type(args), strings=data)
         result = client.query(request)
-        for idx, num in enumerate(result.ids):
-            if args.verbose:
-                print "%s\t%i" % (data[idx], num)
-            else:
-                print "%i" % num
+        if not args.silent:
+            for idx, num in enumerate(result.ids):
+                if args.verbose:
+                    print "%s\t%i" % (data[idx], num)
+                else:
+                    print "%i" % num
     else:
         request = Query(get_query_type(args), ids=data)
         result = client.query(request)
