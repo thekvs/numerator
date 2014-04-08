@@ -41,8 +41,8 @@ SET(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
 ExternalProject_Add(
     boost
     PREFIX ${boost_PREFIX}
-    URL "http://heanet.dl.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.gz"
-    URL_MD5 "efbfbff5a85a9330951f243d0a46e4b9"
+    URL "http://heanet.dl.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.gz"
+    URL_MD5 "93780777cfbf999a600f62883bd54b17"
     CONFIGURE_COMMAND ${boost_PREFIX}/src/boost/bootstrap.sh --with-libraries=thread,system --prefix=${boost_PREFIX}
     BUILD_COMMAND ./b2
     INSTALL_COMMAND ./b2 install
