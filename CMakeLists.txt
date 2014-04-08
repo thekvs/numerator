@@ -37,31 +37,26 @@ else()
     set(MAKE_PROGRAM "make")
 endif()
 
-find_package(Boost QUIET)
-if (NOT Boost_FOUND)
-    set(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
-    ExternalProject_Add(
-        boost
-        PREFIX ${boost_PREFIX}
-        URL "http://netcologne.dl.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.gz"
-        URL_MD5 "efbfbff5a85a9330951f243d0a46e4b9"
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND mkdir -p ${boost_PREFIX}/include/ && cp -r ${boost_PREFIX}/src/boost/boost ${boost_PREFIX}/include/
-    )
-    set(Boost_INCLUDE_DIRS ${boost_PREFIX})
-    include_directories(${Boost_INCLUDE_DIRS}/include)
-    message(STATUS "Using Boost from ${Boost_INCLUDE_DIRS}/include")
-else()
-    include_directories(${Boost_INCLUDE_DIRS})
-    message(STATUS "Using Boost from ${Boost_INCLUDE_DIRS}")
-endif()
+SET(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
+ExternalProject_Add(
+    boost
+    PREFIX ${boost_PREFIX}
+    URL "http://heanet.dl.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.gz"
+    URL_MD5 "efbfbff5a85a9330951f243d0a46e4b9"
+    CONFIGURE_COMMAND ${boost_PREFIX}/src/boost/bootstrap.sh --with-libraries=thread,system --prefix=${boost_PREFIX}
+    BUILD_COMMAND ./b2
+    INSTALL_COMMAND ./b2 install
+    BUILD_IN_SOURCE 1
+)
+INCLUDE_DIRECTORIES(${boost_PREFIX}/include)
+SET(BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_thread.a)
+LIST(APPEND BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_system.a)
 
 set(judy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/judy)
 ExternalProject_Add(
     judy
     PREFIX ${judy_PREFIX}
-    URL "http://citylan.dl.sourceforge.net/project/judy/judy/Judy-1.0.5/Judy-1.0.5.tar.gz"
+    URL "http://heanet.dl.sourceforge.net/project/judy/judy/Judy-1.0.5/Judy-1.0.5.tar.gz"
     URL_MD5 "115a0d26302676e962ae2f70ec484a54"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${judy_PREFIX}/src/judy/configure --prefix=${judy_PREFIX} --enable-64-bit
     BUILD_COMMAND ${MAKE_PROGRAM}
@@ -126,15 +121,14 @@ ExternalProject_Add(
 include_directories(${thrift_PREFIX}/include)
 set(THRIFT_LIBRARIES ${thrift_PREFIX}/lib/libthrift.a)
 set(THRIFT_GENERATOR ${thrift_PREFIX}/bin/thrift)
-if (NOT Boost_FOUND)
-    add_dependencies(thrift boost)
-endif()
+add_dependencies(thrift boost)
 
 set(LINKLIBS    ${THRIFT_LIBRARIES}
                 ${LEVELDB_LIBRARIES}
                 ${SNAPPY_LIBRARIES}
                 ${GLOG_LIBRARIES}
                 ${JUDY_LIBRARIES}
+                ${BOOST_LIBRARIES}
                 ${CMAKE_THREAD_LIBS_INIT}
 )
 
