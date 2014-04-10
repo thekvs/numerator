@@ -44,8 +44,8 @@ ExternalProject_Add(
     URL "http://heanet.dl.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.gz"
     URL_MD5 "93780777cfbf999a600f62883bd54b17"
     CONFIGURE_COMMAND ${boost_PREFIX}/src/boost/bootstrap.sh --with-libraries=thread,system --prefix=${boost_PREFIX}
-    BUILD_COMMAND ./b2
-    INSTALL_COMMAND ./b2 install
+    BUILD_COMMAND ./bjam link=static
+    INSTALL_COMMAND ./bjam link=static install
     BUILD_IN_SOURCE 1
 )
 INCLUDE_DIRECTORIES(${boost_PREFIX}/include)
