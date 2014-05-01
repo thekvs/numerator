@@ -252,12 +252,14 @@ main(int argc, char **argv)
     }
 
     if (data_dir.empty()) {
-        std::cerr << "Error: mandatory parameter -d is not specified" << std::endl;
+        std::cerr << "Error: mandatory parameter -d is not specified." << std::endl;
+        std::cerr << "Run with -h switch to get help message." << std::endl;
         exit(EXIT_FAILURE);
     }
 
     if (logs_dir.empty()) {
-        std::cerr << "Error: mandatory parameter -l is not specified" << std::endl;
+        std::cerr << "Error: mandatory parameter -l is not specified." << std::endl;
+        std::cerr << "Run with -h switch to get help message." << std::endl;
         exit(EXIT_FAILURE);
     }
 
