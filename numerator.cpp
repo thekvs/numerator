@@ -19,8 +19,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/lock_guard.hpp> 
+#include <boost/thread.hpp>
 
 #include "gen-cpp/Numerator.h"
 #include "disk_storage.hpp"
@@ -311,13 +310,8 @@ main(int argc, char **argv)
 
     TThreadPoolServer server(processor, server_transport, transport_factory, protocol_factory, thread_manager);
 
-    pthread_t sigwaiter_tid;
-
-    rc = pthread_create(&sigwaiter_tid, NULL, &sigwaiter, &server);
-    if (rc != 0) {
-        LOG(ERROR) << "pthread_create() failed: " << rc << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    boost::thread sigwaiter_thread(sigwaiter, &server);
+    sigwaiter_thread.detach();
 
     server.serve();
 
