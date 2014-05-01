@@ -203,7 +203,7 @@ main(int argc, char **argv)
     int         cache_size = kDefaultCacheSize;
     bool        disable_s2i_queries = false;
 
-    int         opt, rc, optidx;
+    int         opt, optidx;
 
     while ((opt = getopt_long(argc, argv, "p:d:l:t:c:hS", longopts, &optidx)) != -1) {
         switch (opt) {
