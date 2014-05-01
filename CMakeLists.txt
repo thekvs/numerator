@@ -32,7 +32,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W")
 
 if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     set(MAKE_PROGRAM "gmake")
-    set(BOOST_ROOT "/usr/local")
 else()
     set(MAKE_PROGRAM "make")
 endif()
@@ -48,7 +47,7 @@ ExternalProject_Add(
     INSTALL_COMMAND ./bjam link=static install
     BUILD_IN_SOURCE 1
 )
-INCLUDE_DIRECTORIES(${boost_PREFIX}/include)
+include_directories(${boost_PREFIX}/include)
 SET(BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_thread.a)
 LIST(APPEND BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_system.a)
 
