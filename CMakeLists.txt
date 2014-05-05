@@ -36,7 +36,7 @@ else()
     set(MAKE_PROGRAM "make")
 endif()
 
-SET(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
+set(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
 ExternalProject_Add(
     boost
     PREFIX ${boost_PREFIX}
@@ -48,8 +48,8 @@ ExternalProject_Add(
     BUILD_IN_SOURCE 1
 )
 include_directories(${boost_PREFIX}/include)
-SET(BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_thread.a)
-LIST(APPEND BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_system.a)
+set(BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_thread.a)
+list(APPEND BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_system.a)
 
 set(judy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/judy)
 ExternalProject_Add(
