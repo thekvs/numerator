@@ -84,7 +84,7 @@ ExternalProject_Add(
     DEPENDS snappy
     PREFIX ${leveldb_PREFIX}
     GIT_REPOSITORY "http://code.google.com/p/leveldb/"
-    GIT_TAG "269fc6ca9416129248db5ca57050cd5d39d177c8"
+    GIT_TAG "e353fbc7ea81f12a5694991b708f8f45343594b1"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${MAKE_PROGRAM} libleveldb.a
     INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
