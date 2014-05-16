@@ -69,9 +69,10 @@ set(snappy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/snappy)
 ExternalProject_Add(
     snappy
     PREFIX ${snappy_PREFIX}
-    URL "http://snappy.googlecode.com/files/snappy-1.1.1.tar.gz"
-    URL_MD5 "8887e3b7253b22a31f5486bca3cbc1c2"
-    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${snappy_PREFIX}/src/snappy/configure --prefix=${snappy_PREFIX}
+    # Snappy 1.1.2
+    URL "https://github.com/google/snappy/archive/1ff9be9b8fafc8528ca9e055646f5932aa5db9c4.zip"
+    URL_MD5 "790d4fc55a9bf4f98da4c5312ce69318"
+    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${snappy_PREFIX}/src/snappy/autogen.sh && ${snappy_PREFIX}/src/snappy/configure --prefix=${snappy_PREFIX}
     BUILD_COMMAND make
     BUILD_IN_SOURCE 1
 )
