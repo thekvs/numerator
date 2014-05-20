@@ -66,10 +66,11 @@ usage(const char *program)
     std::cerr << "Usage: " << program << " args" << std::endl;
     std::cerr << std::endl;
     std::cerr << "Arguments:" << std::endl;
-    std::cerr << "  -h,--help           write this help message and exit" << std::endl;
-    std::cerr << "  -n,--numerator arg  numerator's address (location:port, default 127.0.0.1:9090)" << std::endl;
-    std::cerr << "  -t,--type arg       type of the query ('s2i' or 'i2s')" << std::endl;
-    std::cerr << "  -d,--data arg       file with data (one string per line)" << std::endl;
+    std::cerr << "  -h,--help            write this help message and exit" << std::endl;
+    std::cerr << "  -n,--numerator arg   numerator's address (location:port, default 127.0.0.1:9090)" << std::endl;
+    std::cerr << "  -t,--type arg        type of the query ('s2i' or 'i2s')" << std::endl;
+    std::cerr << "  -d,--data arg        file with data (one string per line)" << std::endl;
+    std::cerr << "  -b,--batch-size arg  number of items in one request" << std::endl;
     std::cerr << std::endl;
 
     exit(EXIT_SUCCESS);
