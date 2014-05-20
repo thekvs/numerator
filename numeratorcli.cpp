@@ -259,7 +259,10 @@ main(int argc, char **argv)
         client.ping();
         run(args, client);
         transport->close();
-    } catch (std::exception &exc) {
+    } catch (NumeratorException& exc) {
+        std::cerr << "Error: " << exc.message << std::endl;
+        exit(EXIT_FAILURE);
+    } catch (std::exception& exc) {
         std::cerr << "Error: " << exc.what() << std::endl;
         exit(EXIT_FAILURE);
     } catch (...) {
