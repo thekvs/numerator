@@ -87,7 +87,7 @@ ExternalProject_Add(
     GIT_REPOSITORY "http://code.google.com/p/leveldb/"
     GIT_TAG "e353fbc7ea81f12a5694991b708f8f45343594b1"
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${MAKE_PROGRAM} libleveldb.a
+    BUILD_COMMAND CXXFLAGS=-I${snappy_PREFIX}/include CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} $(MAKE) libleveldb.a
     INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
     BUILD_IN_SOURCE 1
 )
@@ -114,8 +114,8 @@ ExternalProject_Add(
     URL "http://www.eu.apache.org/dist/thrift/0.9.1/thrift-0.9.1.tar.gz"
     URL_MD5 "d2e46148f6e800a9492dbd848c66ab6e"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${thrift_PREFIX}/src/thrift/configure --prefix=${thrift_PREFIX} --with-boost=${boost_PREFIX} --enable-shared=no --with-libevent=no --with-c_glib=no --with-java=no --with-erlang=no --with-python=no --with-perl=no --with-php=no --with-php_extension=no --with-ruby=no --with-haskell=no --with-go=no --with-d=no
-    BUILD_COMMAND ${MAKE_PROGRAM}
-    INSTALL_COMMAND ${MAKE_PROGRAM} install
+    BUILD_COMMAND $(MAKE)
+    INSTALL_COMMAND $(MAKE) install
     BUILD_IN_SOURCE 1
 )
 include_directories(${thrift_PREFIX}/include)
