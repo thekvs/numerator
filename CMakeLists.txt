@@ -73,7 +73,7 @@ ExternalProject_Add(
     URL "https://github.com/google/snappy/archive/1ff9be9b8fafc8528ca9e055646f5932aa5db9c4.zip"
     URL_MD5 "790d4fc55a9bf4f98da4c5312ce69318"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${snappy_PREFIX}/src/snappy/autogen.sh && ${snappy_PREFIX}/src/snappy/configure --prefix=${snappy_PREFIX}
-    BUILD_COMMAND make
+    BUILD_COMMAND $(MAKE)
     BUILD_IN_SOURCE 1
 )
 include_directories(${snappy_PREFIX}/include)
@@ -101,7 +101,7 @@ ExternalProject_Add(
     URL "http://google-glog.googlecode.com/files/glog-0.3.3.tar.gz"
     URL_MD5 "a6fd2c22f8996846e34c763422717c18"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${glog_PREFIX}/src/glog/configure --prefix=${glog_PREFIX} --enable-shared=no
-    BUILD_COMMAND make
+    BUILD_COMMAND $(MAKE)
     BUILD_IN_SOURCE 1
 )
 include_directories(${glog_PREFIX}/include)
