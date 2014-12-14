@@ -13,6 +13,7 @@ include(CheckTypeSize)
 include(CheckIncludeFile)
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
+include(FindPkgConfig)
 
 CHECK_INCLUDE_FILES("inttypes.h" HAVE_INTTYPES_H)
 CHECK_INCLUDE_FILES("netinet/in.h" HAVE_NETINET_IN_H)
@@ -35,6 +36,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 else()
     set(MAKE_PROGRAM "make")
 endif()
+
+pkg_check_modules(GLOG REQUIRED libglog)
 
 set(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
 ExternalProject_Add(
@@ -94,19 +97,6 @@ ExternalProject_Add(
 include_directories(${leveldb_PREFIX}/include)
 set(LEVELDB_LIBRARIES ${leveldb_PREFIX}/lib/libleveldb.a)
 
-set(glog_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/glog)
-ExternalProject_Add(
-    glog
-    PREFIX ${glog_PREFIX}
-    URL "http://google-glog.googlecode.com/files/glog-0.3.3.tar.gz"
-    URL_MD5 "a6fd2c22f8996846e34c763422717c18"
-    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${glog_PREFIX}/src/glog/configure --prefix=${glog_PREFIX} --enable-shared=no
-    BUILD_COMMAND $(MAKE)
-    BUILD_IN_SOURCE 1
-)
-include_directories(${glog_PREFIX}/include)
-set(GLOG_LIBRARIES ${glog_PREFIX}/lib/libglog.a)
-
 set(thrift_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/thrift)
 ExternalProject_Add(
     thrift
@@ -123,13 +113,14 @@ set(THRIFT_LIBRARIES ${thrift_PREFIX}/lib/libthrift.a)
 set(THRIFT_GENERATOR ${thrift_PREFIX}/bin/thrift)
 add_dependencies(thrift boost)
 
-set(LINKLIBS    ${THRIFT_LIBRARIES}
-                ${LEVELDB_LIBRARIES}
-                ${SNAPPY_LIBRARIES}
-                ${GLOG_LIBRARIES}
-                ${JUDY_LIBRARIES}
-                ${BOOST_LIBRARIES}
-                ${CMAKE_THREAD_LIBS_INIT}
+set(LINKLIBS
+    ${THRIFT_LIBRARIES}
+    ${LEVELDB_LIBRARIES}
+    ${SNAPPY_LIBRARIES}
+    ${JUDY_LIBRARIES}
+    ${BOOST_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${GLOG_LIBRARIES}
 )
 
 add_custom_command(
