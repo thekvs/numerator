@@ -50,7 +50,7 @@ ExternalProject_Add(
     INSTALL_COMMAND ./bjam link=static install
     BUILD_IN_SOURCE 1
 )
-include_directories(${boost_PREFIX}/include)
+include_directories(SYSTEM ${boost_PREFIX}/include)
 set(BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_thread.a)
 list(APPEND BOOST_LIBRARIES ${boost_PREFIX}/lib/libboost_system.a)
 
@@ -65,7 +65,7 @@ ExternalProject_Add(
     INSTALL_COMMAND ${MAKE_PROGRAM} install
     BUILD_IN_SOURCE 1
 )
-include_directories(${judy_PREFIX}/include)
+include_directories(SYSTEM ${judy_PREFIX}/include)
 set(JUDY_LIBRARIES ${judy_PREFIX}/lib/libJudy.a)
 
 set(snappy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/snappy)
@@ -79,7 +79,7 @@ ExternalProject_Add(
     BUILD_COMMAND $(MAKE)
     BUILD_IN_SOURCE 1
 )
-include_directories(${snappy_PREFIX}/include)
+include_directories(SYSTEM ${snappy_PREFIX}/include)
 set(SNAPPY_LIBRARIES ${snappy_PREFIX}/lib/libsnappy.a)
 
 set(leveldb_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/leveldb)
@@ -94,7 +94,7 @@ ExternalProject_Add(
     INSTALL_COMMAND mkdir -p ${leveldb_PREFIX}/lib/ && cp ${leveldb_PREFIX}/src/leveldb/libleveldb.a ${leveldb_PREFIX}/lib/ && cp -r ${leveldb_PREFIX}/src/leveldb/include ${leveldb_PREFIX}/
     BUILD_IN_SOURCE 1
 )
-include_directories(${leveldb_PREFIX}/include)
+include_directories(SYSTEM ${leveldb_PREFIX}/include)
 set(LEVELDB_LIBRARIES ${leveldb_PREFIX}/lib/libleveldb.a)
 
 set(thrift_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/thrift)
@@ -108,7 +108,7 @@ ExternalProject_Add(
     INSTALL_COMMAND $(MAKE) install
     BUILD_IN_SOURCE 1
 )
-include_directories(${thrift_PREFIX}/include)
+include_directories(SYSTEM ${thrift_PREFIX}/include)
 set(THRIFT_LIBRARIES ${thrift_PREFIX}/lib/libthrift.a)
 set(THRIFT_GENERATOR ${thrift_PREFIX}/bin/thrift)
 add_dependencies(thrift boost)
