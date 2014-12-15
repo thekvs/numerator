@@ -101,9 +101,9 @@ set(thrift_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/thrift)
 ExternalProject_Add(
     thrift
     PREFIX ${thrift_PREFIX}
-    URL "http://www.eu.apache.org/dist/thrift/0.9.1/thrift-0.9.1.tar.gz"
-    URL_MD5 "d2e46148f6e800a9492dbd848c66ab6e"
-    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${thrift_PREFIX}/src/thrift/configure --prefix=${thrift_PREFIX} --with-boost=${boost_PREFIX} --enable-shared=no --with-libevent=no --with-c_glib=no --with-java=no --with-erlang=no --with-python=no --with-perl=no --with-php=no --with-php_extension=no --with-ruby=no --with-haskell=no --with-go=no --with-d=no
+    URL "http://www.eu.apache.org/dist/thrift/0.9.2/thrift-0.9.2.tar.gz"
+    URL_MD5 "89f63cc4d0100912f4a1f8a9dee63678"
+    CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${thrift_PREFIX}/src/thrift/configure --prefix=${thrift_PREFIX} --with-boost=${boost_PREFIX} --enable-shared=no --with-libevent=no --with-c_glib=no --with-java=no --with-erlang=no --with-python=no --with-perl=no --with-php=no --with-php_extension=no --with-ruby=no --with-haskell=no --with-go=no --with-d=no --enable-tests=no
     BUILD_COMMAND $(MAKE)
     INSTALL_COMMAND $(MAKE) install
     BUILD_IN_SOURCE 1
