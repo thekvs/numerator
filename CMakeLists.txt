@@ -15,8 +15,8 @@ include(CheckCXXCompilerFlag)
 include(ExternalProject)
 include(FindPkgConfig)
 
-CHECK_INCLUDE_FILES("inttypes.h" HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILES("netinet/in.h" HAVE_NETINET_IN_H)
+CHECK_INCLUDE_FILE("inttypes.h" HAVE_INTTYPES_H)
+CHECK_INCLUDE_FILE("netinet/in.h" HAVE_NETINET_IN_H)
 
 if (HAVE_INTTYPES_H)
     add_definitions("-DHAVE_INTTYPES_H")
@@ -43,8 +43,8 @@ set(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
 ExternalProject_Add(
     boost
     PREFIX ${boost_PREFIX}
-    URL "http://heanet.dl.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.gz"
-    URL_MD5 "93780777cfbf999a600f62883bd54b17"
+    URL "https://heanet.dl.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.gz"                                                        
+    URL_MD5 "7b493c08bc9557bbde7e29091f28b605"
     CONFIGURE_COMMAND ${boost_PREFIX}/src/boost/bootstrap.sh --with-libraries=thread,system --prefix=${boost_PREFIX}
     BUILD_COMMAND ./bjam link=static
     INSTALL_COMMAND ./bjam link=static install
@@ -101,8 +101,8 @@ set(thrift_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/thrift)
 ExternalProject_Add(
     thrift
     PREFIX ${thrift_PREFIX}
-    URL "http://www.eu.apache.org/dist/thrift/0.9.2/thrift-0.9.2.tar.gz"
-    URL_MD5 "89f63cc4d0100912f4a1f8a9dee63678"
+    URL "http://www.eu.apache.org/dist/thrift/0.9.3/thrift-0.9.3.tar.gz"
+    URL_MD5 "88d667a8ae870d5adeca8cb7d6795442"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${thrift_PREFIX}/src/thrift/configure --prefix=${thrift_PREFIX} --with-boost=${boost_PREFIX} --enable-shared=no --with-libevent=no --with-c_glib=no --with-java=no --with-erlang=no --with-python=no --with-perl=no --with-php=no --with-php_extension=no --with-ruby=no --with-haskell=no --with-go=no --with-d=no --enable-tests=no
     BUILD_COMMAND $(MAKE)
     INSTALL_COMMAND $(MAKE) install
@@ -158,7 +158,7 @@ set_target_properties(numerator-static PROPERTIES OUTPUT_NAME numerator)
 set_target_properties(numerator-static PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(numerator ${numerator_SOURCE_DIR}/numerator.cpp)
-add_dependencies(numerator leveldb glog judy)
+add_dependencies(numerator leveldb judy)
 
 target_link_libraries(numerator numerator-static ${LINKLIBS})
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -166,14 +166,14 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_executable(numexport ${numerator_SOURCE_DIR}/numexport.cpp)
-add_dependencies(numexport leveldb glog judy)
+add_dependencies(numexport leveldb judy)
 target_link_libraries(numexport numerator-static ${LINKLIBS})
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(numexport rt)
 endif()
 
 add_executable(numimport ${numerator_SOURCE_DIR}/numimport.cpp)
-add_dependencies(numimport leveldb glog judy)
+add_dependencies(numimport leveldb judy)
 target_link_libraries(numimport numerator-static ${LINKLIBS})
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(numimport rt)
