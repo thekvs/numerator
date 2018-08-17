@@ -43,7 +43,7 @@ set(boost_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/boost)
 ExternalProject_Add(
     boost
     PREFIX ${boost_PREFIX}
-    URL "https://heanet.dl.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.tar.gz"                                                        
+    URL "https://dl.bintray.com/boostorg/release/1.63.0/source/boost_1_63_0.tar.gz"
     URL_MD5 "7b493c08bc9557bbde7e29091f28b605"
     CONFIGURE_COMMAND ${boost_PREFIX}/src/boost/bootstrap.sh --with-libraries=thread,system --prefix=${boost_PREFIX}
     BUILD_COMMAND ./bjam link=static
@@ -58,7 +58,7 @@ set(judy_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/judy)
 ExternalProject_Add(
     judy
     PREFIX ${judy_PREFIX}
-    URL "http://heanet.dl.sourceforge.net/project/judy/judy/Judy-1.0.5/Judy-1.0.5.tar.gz"
+    URL "https://netix.dl.sourceforge.net/project/judy/judy/Judy-1.0.5/Judy-1.0.5.tar.gz"
     URL_MD5 "115a0d26302676e962ae2f70ec484a54"
     CONFIGURE_COMMAND CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER} ${judy_PREFIX}/src/judy/configure --prefix=${judy_PREFIX} --enable-64-bit
     BUILD_COMMAND ${MAKE_PROGRAM}
